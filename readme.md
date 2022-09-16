@@ -1,4 +1,4 @@
-goparsify [![CircleCI](https://circleci.com/gh/Vektah/goparsify/tree/master.svg?style=shield)](https://circleci.com/gh/Vektah/goparsify/tree/master) [![godoc](http://b.repl.ca/v1/godoc-reference-blue.png)](https://godoc.org/github.com/Vektah/goparsify) [![Go Report Card](https://goreportcard.com/badge/github.com/vektah/goparsify)](https://goreportcard.com/report/github.com/vektah/goparsify)
+goparsify [![CircleCI](https://circleci.com/gh/Vektah/goparsify/tree/master.svg?style=shield)](https://circleci.com/gh/Vektah/goparsify/tree/master) [![godoc](http://b.repl.ca/v1/godoc-reference-blue.png)](https://godoc.org/github.com/damienstanton/goparsify) [![Go Report Card](https://goreportcard.com/badge/github.com/damienstanton/goparsify)](https://goreportcard.com/report/github.com/damienstanton/goparsify)
 =========
 
 A parser-combinator library for building easy to test, read and maintain parsers using functional composition.
@@ -16,7 +16,7 @@ BenchmarkUnmarshalParsec-8         20000             74880 ns/op           50846
 BenchmarkUnmarshalParsify-8        30000             50631 ns/op           45055 B/op        233 allocs/op
 BenchmarkUnmarshalStdlib-8         30000             46989 ns/op           14210 B/op        260 allocs/op
 PASS
-ok      github.com/vektah/goparsify/json        6.124s
+ok      github.com/damienstanton/goparsify/json        6.124s
 ```
 
 Most of the remaining small allocs are from putting things in `interface{}` and are pretty unavoidable. https://www.darkcoding.net/software/go-the-price-of-interface/ is a good read.
@@ -104,7 +104,7 @@ html.go:44 |                 |   } found [</,,body,>]
 html.go:48 |                 | } found [[<,body,,map[string]string{},>],,[]interface {}{"hello ", html.htmlTag{Name:"p", Attributes:map[string]string{"color":"blue"}, Body:[]interface {}{"world"}}},[</,,body,>]]
 --- PASS: TestParse (0.00s)
 PASS
-ok      github.com/vektah/goparsify/html        0.117s
+ok      github.com/damienstanton/goparsify/html        0.117s
 ```
 
 ### debugging performance

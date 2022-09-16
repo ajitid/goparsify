@@ -1,3 +1,4 @@
+//go:build debug
 // +build debug
 
 package goparsify
@@ -11,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"kesim.org/goparsify/debug"
+	"github.com/damienstanton/goparsify/debug"
 )
 
 var log io.Writer = nil
