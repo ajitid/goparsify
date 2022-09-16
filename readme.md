@@ -1,4 +1,4 @@
-goparsify [![CircleCI](https://circleci.com/gh/Vektah/goparsify/tree/master.svg?style=shield)](https://circleci.com/gh/Vektah/goparsify/tree/master) [![godoc](http://b.repl.ca/v1/godoc-reference-blue.png)](https://godoc.org/github.com/damienstanton/goparsify) [![Go Report Card](https://goreportcard.com/badge/github.com/damienstanton/goparsify)](https://goreportcard.com/report/github.com/damienstanton/goparsify)
+[![Go](https://github.com/damienstanton/goparsify/actions/workflows/go.yaml/badge.svg)](https://github.com/damienstanton/goparsify/actions/workflows/go.yaml)
 =========
 
 A parser-combinator library for building easy to test, read and maintain parsers using functional composition.
