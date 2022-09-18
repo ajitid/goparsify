@@ -1,113 +1,127 @@
+# Goparsify
+
 [![Go](https://github.com/damienstanton/goparsify/actions/workflows/go.yaml/badge.svg)](https://github.com/damienstanton/goparsify/actions/workflows/go.yaml)
-=========
+
+---
 
 A parser-combinator library for building easy to test, read and maintain parsers using functional composition.
 
 Everything should be unicode safe by default, but you can opt out of unicode whitespace for a decent ~20% performance boost.
+
 ```go
 Run(parser, input, ASCIIWhitespace)
 ```
 
-### benchmarks
-I dont have many benchmarks set up yet, its pretty quick:
-```
-$ go test -benchmem -bench=. ./json
-BenchmarkUnmarshalParsec-8         20000             74880 ns/op           50846 B/op       1318 allocs/op
-BenchmarkUnmarshalParsify-8        30000             50631 ns/op           45055 B/op        233 allocs/op
-BenchmarkUnmarshalStdlib-8         30000             46989 ns/op           14210 B/op        260 allocs/op
+## Benchmarks
+
+```console
+$ make bench
+goos: darwin
+goarch: arm64
+pkg: github.com/damienstanton/goparsify/json
+BenchmarkUnmarshalParsec-8         33187             34662 ns/op           49375 B/op       1307 allocs/op
+BenchmarkUnmarshalParsify-8        59160             20299 ns/op           44596 B/op        212 allocs/op
+BenchmarkUnmarshalStdlib-8         52909             22604 ns/op           13427 B/op        251 allocs/op
 PASS
-ok      github.com/damienstanton/goparsify/json        6.124s
+ok      github.com/damienstanton/goparsify/json 4.670s
 ```
 
 Most of the remaining small allocs are from putting things in `interface{}` and are pretty unavoidable. https://www.darkcoding.net/software/go-the-price-of-interface/ is a good read.
 
-### debugging parsers
+## Debugging parsers
 
 When a parser isnt working as you intended you can build with debugging and enable logging to get a detailed log of exactly what the parser is doing.
 
-1. First build with debug using `-tags debug`
-2. enable logging by calling `EnableLogging(os.Stdout)` in your code
+First build with debug using `-tags debug`:
 
-This works great with tests, eg in the goparsify source tree
+```console
+$ go build -tags debug
 ```
-adam:goparsify(master)$ go test -tags debug ./html -v
+
+Then, enable logging by calling `EnableLogging(os.Stdout)` in your code. This works great with tests, eg in the
+goparsify source tree:
+
+```console
+$ go test -tags debug ./html -v
 === RUN   TestParse
 html.go:48 | <body>hello <p  | tag {
 html.go:43 | <body>hello <p  |   tstart {
-html.go:43 | body>hello <p c |     < found <
-html.go:20 | >hello <p color |     identifier found body
+html.go:43 | body>hello <p c |     < found "<"
+html.go:20 | >hello <p color |     identifier found "body"
 html.go:33 | >hello <p color |     attrs {
 html.go:32 | >hello <p color |       attr {
 html.go:20 | >hello <p color |         identifier did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:32 | >hello <p color |       } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:33 | >hello <p color |     } found
-html.go:43 | hello <p color= |     > found >
-html.go:43 | hello <p color= |   } found [<,body,,map[string]string{},>]
+html.go:33 | >hello <p color |     } found ""
+html.go:43 | hello <p color= |     > found ">"
+html.go:43 | hello <p color= |   } found "[<,body,,map[string
 html.go:24 | hello <p color= |   elements {
 html.go:23 | hello <p color= |     element {
-html.go:21 | <p color="blue" |       text found hello
-html.go:23 | <p color="blue" |     } found "hello "
-html.go:23 | <p color="blue" |     element {
-html.go:21 | <p color="blue" |       text did not find <>
-html.go:48 | <p color="blue" |       tag {
-html.go:43 | <p color="blue" |         tstart {
-html.go:43 | p color="blue"> |           < found <
-html.go:20 |  color="blue">w |           identifier found p
-html.go:33 |  color="blue">w |           attrs {
-html.go:32 |  color="blue">w |             attr {
-html.go:20 | ="blue">world</ |               identifier found color
-html.go:32 | "blue">world</p |               = found =
+html.go:21 | <p color=\"blue |       text found "hello "
+html.go:23 | <p color=\"blue |     } found "\"hello \""
+html.go:23 | <p color=\"blue |     element {
+html.go:21 | <p color=\"blue |       text did not find <>
+html.go:48 | <p color=\"blue |       tag {
+html.go:43 | <p color=\"blue |         tstart {
+html.go:43 | p color=\"blue\ |           < found "<"
+html.go:20 |  color=\"blue\" |           identifier found "p"
+html.go:33 |  color=\"blue\" |           attrs {
+html.go:32 |  color=\"blue\" |             attr {
+html.go:20 | =\"blue\">world |               identifier found "color"
+html.go:32 | \"blue\">world< |               = found "="
 html.go:32 | >world</p></bod |               string literal found "blue"
-html.go:32 | >world</p></bod |             } found [color,=,"blue"]
+html.go:32 | >world</p></bod |             } found "[color,=,blue]"
 html.go:32 | >world</p></bod |             attr {
 html.go:20 | >world</p></bod |               identifier did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:32 | >world</p></bod |             } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:33 | >world</p></bod |           } found [[color,=,"blue"]]
-html.go:43 | world</p></body |           > found >
-html.go:43 | world</p></body |         } found [<,p,,map[string]string{"color":"blue"},>]
+html.go:33 | >world</p></bod |           } found "[[color,=,blue]]"
+html.go:43 | world</p></body |           > found ">"
+html.go:43 | world</p></body |         } found "[<,p,,map[string]st
 html.go:24 | world</p></body |         elements {
 html.go:23 | world</p></body |           element {
-html.go:21 | </p></body>     |             text found world
-html.go:23 | </p></body>     |           } found "world"
+html.go:21 | </p></body>     |             text found "world"
+html.go:23 | </p></body>     |           } found "\"world\""
 html.go:23 | </p></body>     |           element {
 html.go:21 | </p></body>     |             text did not find <>
 html.go:48 | </p></body>     |             tag {
 html.go:43 | </p></body>     |               tstart {
-html.go:43 | /p></body>      |                 < found <
+html.go:43 | /p></body>      |                 < found "<"
 html.go:20 | /p></body>      |                 identifier did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:43 | </p></body>     |               } did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:48 | </p></body>     |             } did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:23 | </p></body>     |           } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:24 | </p></body>     |         } found ["world"]
+html.go:24 | </p></body>     |         } found "[\"world\"]"
 html.go:44 | </p></body>     |         tend {
-html.go:44 | p></body>       |           </ found </
-html.go:20 | ></body>        |           identifier found p
-html.go:44 | </body>         |           > found >
-html.go:44 | </body>         |         } found [</,,p,>]
-html.go:48 | </body>         |       } found "hello "
-html.go:23 | </body>         |     } found html.htmlTag{Name:"p", Attributes:map[string]string{"color":"blue"}, Body:[]interface {}{"world"}}
+html.go:44 | p></body>       |           </ found "</"
+html.go:20 | ></body>        |           identifier found "p"
+html.go:44 | </body>         |           > found ">"
+html.go:44 | </body>         |         } found "[</,,p,>]"
+html.go:48 | </body>         |       } found "[[<,p,,map[string]s
+html.go:23 | </body>         |     } found "html.htmlTag{Name:\
 html.go:23 | </body>         |     element {
+html.go:21 | </body>         |       text did not find <>
 html.go:48 | </body>         |       tag {
 html.go:43 | </body>         |         tstart {
-html.go:43 | /body>          |           < found <
+html.go:43 | /body>          |           < found "<"
 html.go:20 | /body>          |           identifier did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:43 | </body>         |         } did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:48 | </body>         |       } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:21 | </body>         |       text did not find <>
 html.go:23 | </body>         |     } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:24 | </body>         |   } found ["hello ",html.htmlTag{Name:"p", Attributes:map[string]string{"color":"blue"}, Body:[]interface {}{"world"}}]
+html.go:24 | </body>         |   } found "[\"hello \",html.ht
 html.go:44 | </body>         |   tend {
-html.go:44 | body>           |     </ found </
-html.go:20 | >               |     identifier found body
-html.go:44 |                 |     > found >
-html.go:44 |                 |   } found [</,,body,>]
-html.go:48 |                 | } found [[<,body,,map[string]string{},>],,[]interface {}{"hello ", html.htmlTag{Name:"p", Attributes:map[string]string{"color":"blue"}, Body:[]interface {}{"world"}}},[</,,body,>]]
+html.go:44 | body>           |     </ found "</"
+html.go:20 | >               |     identifier found "body"
+html.go:44 |                 |     > found ">"
+html.go:44 |                 |   } found "[</,,body,>]"
+html.go:48 |                 | } found "[[<,body,,map[strin
 --- PASS: TestParse (0.00s)
 PASS
-ok      github.com/damienstanton/goparsify/html        0.117s
+ok      github.com/damienstanton/goparsify/html 0.196s
+
 ```
 
-### debugging performance
+## Debugging performance
+
 If you build the parser with -tags debug it will instrument each parser and a call to DumpDebugStats() will show stats:
 
 |             var name |              matches |      total time |       self time |      calls |     errors | location
@@ -136,19 +150,22 @@ All times are cumulative, it would be nice to break this down into a parse tree 
 
 This is **free** when the debug tag isnt used.  
 
-### example calculator
+## Example calculator
+
 Lets say we wanted to build a calculator that could take an expression and calculate the result.
 
 Lets start with test:
+
 ```go
 func TestNumbers(t *testing.T) {
-	result, err := Calc(`1`)
-	require.NoError(t, err)
-	require.EqualValues(t, 1, result)
+    result, err := Calc(`1`)
+    require.NoError(t, err)
+    require.EqualValues(t, 1, result)
 }
 ```
 
 Then define a parser for numbers
+
 ```go
 var number = NumberLit().Map(func(n Result) Result {
     switch i := n.Result.(type) {
@@ -162,14 +179,12 @@ var number = NumberLit().Map(func(n Result) Result {
 })
 
 func Calc(input string) (float64, error) {
-	result, err := Run(y, input)
-	if err != nil {
-		return 0, err
-	}
-
-	return result.(float64), nil
+    result, err := Run(y, input)
+    if err != nil {
+        return 0, err
+    }
+    return result.(float64), nil
 }
-
 ```
 
 This parser will return numbers either as float64 or int depending on the literal, for this calculator we only want floats so we Map the results and type cast.
@@ -180,9 +195,9 @@ Time to add addition
 
 ```go
 func TestAddition(t *testing.T) {
-	result, err := Calc(`1+1`)
-	require.NoError(t, err)
-	require.EqualValues(t, 2, result)
+    result, err := Calc(`1+1`)
+    require.NoError(t, err)
+    require.EqualValues(t, 2, result)
 }
 
 
@@ -209,11 +224,13 @@ sum = Seq(number, Some(And(sumOp, number))).Map(func(n Result) Result {
 This parser will match number ([+-] number)+, then map its to be the sum. See how the Child map directly to the positions in the parsers? n is the result of the and, `n.Child[0]` is its first argument, `n.Child[1]` is the result of the Some parser, `n.Child[1].Child[0]` is the result of the first And and so fourth. Given how closely tied the parser and the Map are it is good to keep the two together.
 
 You can continue like this and add multiplication and parenthesis fairly easily. Eventually if you keep adding parsers you will end up with a loop, and go will give you a handy error message like:
-```
+
+```text
 typechecking loop involving value = goparsify.Any(number, groupExpr)
 ```
 
 we need to break the loop using a pointer, then set its value in init
+
 ```go
 var (
     value Parser
@@ -221,14 +238,16 @@ var (
 )
 
 func init() {
-	value = Any(number, groupExpr)
+    value = Any(number, groupExpr)
 }
 ```
 
 Take a look at [calc](calc/calc.go) for a full example.
 
-### preventing backtracking with cuts
+## Preventing backtracking with cuts
+
 A cut is a marker that prevents backtracking past the point it was set. This greatly improves error messages when used correctly: 
+
 ```go
 alpha := Chars("a-z")
 
