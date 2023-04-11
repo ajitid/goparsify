@@ -4,6 +4,14 @@
 
 ---
 
+Here's what this fork does:
+
+- Modernizes dep and build management by pulling in changes from https://github.com/damienstanton/goparsify
+- Fixes few issues by pulling in changes from https://github.com/oec/goparsify
+- Renames `Many`/`Some` to comprehensible terms: `ZeroOrMore` and `OneOrMore`
+
+---
+
 A parser-combinator library for building easy to test, read and maintain parsers using functional composition.
 
 Everything should be unicode safe by default, but you can opt out of unicode whitespace for a decent ~20% performance boost.
@@ -124,31 +132,31 @@ ok      github.com/damienstanton/goparsify/html 0.196s
 
 If you build the parser with -tags debug it will instrument each parser and a call to DumpDebugStats() will show stats:
 
-|             var name |              matches |      total time |       self time |      calls |     errors | location
-| -------------------- | -------------------- | --------------- | --------------- | ---------- | ---------- | ----------
-|               _value |                Any() |      5.0685431s |       34.0131ms |     878801 |          0 | json.go:36
-|              _object |                Seq() |      3.7513821s |       10.5038ms |     161616 |      40403 | json.go:24
-|          _properties |               Some() |      3.6863512s |        5.5028ms |     121213 |          0 | json.go:14
-|          _properties |                Seq() |      3.4912614s |       46.0229ms |     818185 |          0 | json.go:14
-|               _array |                Seq() |      931.4679ms |        3.5014ms |      65660 |      55558 | json.go:16
-|               _array |               Some() |      911.4597ms |              0s |      10102 |          0 | json.go:16
-|          _properties |       string literal |      126.0662ms |       44.5201ms |     818185 |          0 | json.go:14
-|              _string |       string literal |        67.033ms |       26.0126ms |     671723 |     136369 | json.go:12
-|          _properties |                    : |       50.0238ms |       45.0205ms |     818185 |          0 | json.go:14
-|          _properties |                    , |       48.5189ms |       36.0146ms |     818185 |     121213 | json.go:14
-|              _number |       number literal |       28.5159ms |       10.5062ms |     287886 |     106066 | json.go:13
-|                _true |                 true |       17.5086ms |       12.5069ms |     252537 |     232332 | json.go:10
-|                _null |                 null |       14.5082ms |        11.007ms |     252538 |     252535 | json.go:9
-|              _object |                    } |       10.5051ms |       10.5033ms |     121213 |          0 | json.go:24
-|               _false |                false |       10.5049ms |        5.0019ms |     232333 |     222229 | json.go:11
-|              _object |                    { |       10.0046ms |        5.0052ms |     161616 |      40403 | json.go:24
-|               _array |                    , |        4.5024ms |        4.0018ms |      50509 |      10102 | json.go:16
-|               _array |                    [ |        4.5014ms |        2.0006ms |      65660 |      55558 | json.go:16
-|               _array |                    ] |              0s |              0s |      10102 |          0 | json.go:16
+| var name     | matches        | total time | self time | calls  | errors | location   |
+| ------------ | -------------- | ---------- | --------- | ------ | ------ | ---------- |
+| \_value      | Any()          | 5.0685431s | 34.0131ms | 878801 | 0      | json.go:36 |
+| \_object     | Seq()          | 3.7513821s | 10.5038ms | 161616 | 40403  | json.go:24 |
+| \_properties | Some()         | 3.6863512s | 5.5028ms  | 121213 | 0      | json.go:14 |
+| \_properties | Seq()          | 3.4912614s | 46.0229ms | 818185 | 0      | json.go:14 |
+| \_array      | Seq()          | 931.4679ms | 3.5014ms  | 65660  | 55558  | json.go:16 |
+| \_array      | Some()         | 911.4597ms | 0s        | 10102  | 0      | json.go:16 |
+| \_properties | string literal | 126.0662ms | 44.5201ms | 818185 | 0      | json.go:14 |
+| \_string     | string literal | 67.033ms   | 26.0126ms | 671723 | 136369 | json.go:12 |
+| \_properties | :              | 50.0238ms  | 45.0205ms | 818185 | 0      | json.go:14 |
+| \_properties | ,              | 48.5189ms  | 36.0146ms | 818185 | 121213 | json.go:14 |
+| \_number     | number literal | 28.5159ms  | 10.5062ms | 287886 | 106066 | json.go:13 |
+| \_true       | true           | 17.5086ms  | 12.5069ms | 252537 | 232332 | json.go:10 |
+| \_null       | null           | 14.5082ms  | 11.007ms  | 252538 | 252535 | json.go:9  |
+| \_object     | }              | 10.5051ms  | 10.5033ms | 121213 | 0      | json.go:24 |
+| \_false      | false          | 10.5049ms  | 5.0019ms  | 232333 | 222229 | json.go:11 |
+| \_object     | {              | 10.0046ms  | 5.0052ms  | 161616 | 40403  | json.go:24 |
+| \_array      | ,              | 4.5024ms   | 4.0018ms  | 50509  | 10102  | json.go:16 |
+| \_array      | [              | 4.5014ms   | 2.0006ms  | 65660  | 55558  | json.go:16 |
+| \_array      | ]              | 0s         | 0s        | 10102  | 0      | json.go:16 |
 
-All times are cumulative, it would be nice to break this down into a parse tree with relative times. This is a nice addition to pprof as it will break down the parsers based on where they are used instead of grouping them all by type. 
+All times are cumulative, it would be nice to break this down into a parse tree with relative times. This is a nice addition to pprof as it will break down the parsers based on where they are used instead of grouping them all by type.
 
-This is **free** when the debug tag isnt used.  
+This is **free** when the debug tag isnt used.
 
 ## Example calculator
 
@@ -246,7 +254,7 @@ Take a look at [calc](calc/calc.go) for a full example.
 
 ## Preventing backtracking with cuts
 
-A cut is a marker that prevents backtracking past the point it was set. This greatly improves error messages when used correctly: 
+A cut is a marker that prevents backtracking past the point it was set. This greatly improves error messages when used correctly:
 
 ```go
 alpha := Chars("a-z")
