@@ -9,6 +9,7 @@ Here's what this fork does:
 - Modernizes dep and build management by pulling in changes from https://github.com/damienstanton/goparsify
 - Fixes few issues by pulling in changes from https://github.com/oec/goparsify
 - Renames `Many`/`Some` to comprehensible terms: `ZeroOrMore` and `OneOrMore`
+- Introduces a new combinator: `Chain`
 
 ---
 

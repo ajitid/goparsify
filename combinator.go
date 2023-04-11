@@ -179,6 +179,43 @@ func Map(parser Parserish, f func(n *Result)) Parser {
 	}
 }
 
+// Chain lets you choose which parser to call on the basis of the result of
+// previous parser.
+//
+// Chain's second argument is a function that takes in the result of the first
+// parser, and with this knowledge, lets you return a successive parser.
+//
+// Result of this successive parser is considered as the result of the Chain.
+func Chain(parser Parserish, getNextParser func(n *Result) Parserish) Parser {
+	p1 := Parsify(parser)
+
+	return NewParser("Chain()", func(ps *State, node *Result) {
+		node.Child = make([]Result, 2)
+		startpos := ps.Pos
+
+		node.Child[0].Input = node.Input
+		p1(ps, &node.Child[0])
+		if ps.Errored() {
+			// We are changing state.Pos, something that's against the rules (see parser.go)
+			// However these groups of code have been copied from Seq(), which also does this.
+			ps.Pos = startpos
+			return
+		}
+
+		node.Child[1].Input = node.Input
+		p2 := Parsify(getNextParser(&node.Child[0]))
+		p2(ps, &node.Child[1])
+		if ps.Errored() {
+			ps.Pos = startpos
+			return
+		}
+
+		node.Result = node.Child[1].Result
+		node.Start = startpos
+		node.End = ps.Pos
+	})
+}
+
 func flatten(n *Result) {
 	if len(n.Child) > 0 {
 		sbuf := &bytes.Buffer{}
