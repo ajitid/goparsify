@@ -136,10 +136,10 @@ If you build the parser with -tags debug it will instrument each parser and a ca
 | ------------ | -------------- | ---------- | --------- | ------ | ------ | ---------- |
 | \_value      | Any()          | 5.0685431s | 34.0131ms | 878801 | 0      | json.go:36 |
 | \_object     | Seq()          | 3.7513821s | 10.5038ms | 161616 | 40403  | json.go:24 |
-| \_properties | Some()         | 3.6863512s | 5.5028ms  | 121213 | 0      | json.go:14 |
+| \_properties | ZeroOrMore()   | 3.6863512s | 5.5028ms  | 121213 | 0      | json.go:14 |
 | \_properties | Seq()          | 3.4912614s | 46.0229ms | 818185 | 0      | json.go:14 |
 | \_array      | Seq()          | 931.4679ms | 3.5014ms  | 65660  | 55558  | json.go:16 |
-| \_array      | Some()         | 911.4597ms | 0s        | 10102  | 0      | json.go:16 |
+| \_array      | ZeroOrMore()   | 911.4597ms | 0s        | 10102  | 0      | json.go:16 |
 | \_properties | string literal | 126.0662ms | 44.5201ms | 818185 | 0      | json.go:14 |
 | \_string     | string literal | 67.033ms   | 26.0126ms | 671723 | 136369 | json.go:12 |
 | \_properties | :              | 50.0238ms  | 45.0205ms | 818185 | 0      | json.go:14 |
@@ -211,7 +211,7 @@ func TestAddition(t *testing.T) {
 
 var sumOp  = Chars("+-", 1, 1)
 
-sum = Seq(number, Some(And(sumOp, number))).Map(func(n Result) Result {
+sum = Seq(number, ZeroOrMore(And(sumOp, number))).Map(func(n Result) Result {
     i := n.Child[0].Result.(float64)
 
     for _, op := range n.Child[1].Child {
@@ -229,7 +229,7 @@ sum = Seq(number, Some(And(sumOp, number))).Map(func(n Result) Result {
 // and update Calc to point to the new root parser -> `result, err := ParseString(sum, input)`
 ```
 
-This parser will match number ([+-] number)+, then map its to be the sum. See how the Child map directly to the positions in the parsers? n is the result of the and, `n.Child[0]` is its first argument, `n.Child[1]` is the result of the Some parser, `n.Child[1].Child[0]` is the result of the first And and so fourth. Given how closely tied the parser and the Map are it is good to keep the two together.
+This parser will match number ([+-] number)+, then map its to be the sum. See how the Child map directly to the positions in the parsers? n is the result of the and, `n.Child[0]` is its first argument, `n.Child[1]` is the result of the ZeroOrMore parser, `n.Child[1].Child[0]` is the result of the first And and so fourth. Given how closely tied the parser and the Map are it is good to keep the two together.
 
 You can continue like this and add multiplication and parenthesis fairly easily. Eventually if you keep adding parsers you will end up with a loop, and go will give you a handy error message like:
 
@@ -242,7 +242,7 @@ we need to break the loop using a pointer, then set its value in init
 ```go
 var (
     value Parser
-    prod = Seq(&value, Some(And(prodOp, &value)))
+    prod = Seq(&value, ZeroOrMore(And(prodOp, &value)))
 )
 
 func init() {

@@ -21,7 +21,7 @@ var (
 	text       = NotChars("<>").Map(func(n *Result) { n.Result = n.Token })
 
 	element  = Any(text, &tag)
-	elements = Some(element).Map(func(n *Result) {
+	elements = ZeroOrMore(element).Map(func(n *Result) {
 		ret := []interface{}{}
 		for _, child := range n.Child {
 			ret = append(ret, child.Result)
@@ -30,7 +30,7 @@ var (
 	})
 
 	attr  = Seq(identifier, "=", StringLit(`"'`))
-	attrs = Some(attr).Map(func(node *Result) {
+	attrs = ZeroOrMore(attr).Map(func(node *Result) {
 		attr := map[string]string{}
 
 		for _, attrNode := range node.Child {

@@ -11,9 +11,9 @@ var (
 	_false      = Bind("false", false)
 	_string     = Map(StringLit(`"`), func(r *Result) { r.Result = r.Token })
 	_number     = NumberLit()
-	_properties = Some(Seq(StringLit(`"`), ":", &_value), ",")
+	_properties = ZeroOrMore(Seq(StringLit(`"`), ":", &_value), ",")
 
-	_array = Seq("[", Cut(), Some(&_value, ","), "]").Map(func(n *Result) {
+	_array = Seq("[", Cut(), ZeroOrMore(&_value, ","), "]").Map(func(n *Result) {
 		ret := []interface{}{}
 		for _, child := range n.Child[2].Child {
 			ret = append(ret, child.Result)

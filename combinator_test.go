@@ -98,35 +98,35 @@ func TestAny(t *testing.T) {
 	})
 }
 
-func TestSome(t *testing.T) {
+func TestZeroOrMore(t *testing.T) {
 	t.Run("Matches sequence with sep", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e,", Some(Chars("a-g"), ","))
+		node, p2 := runParser("a,b,c,d,e,", ZeroOrMore(Chars("a-g"), ","))
 		require.False(t, p2.Errored())
 		assertSequence(t, node, "a", "b", "c", "d", "e")
 		require.Equal(t, 10, p2.Pos)
 	})
 
 	t.Run("Matches sequence without trailing sep", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e1111", Some(Chars("a-g"), ","))
+		node, p2 := runParser("a,b,c,d,e1111", ZeroOrMore(Chars("a-g"), ","))
 		require.False(t, p2.Errored())
 		assertSequence(t, node, "a", "b", "c", "d", "e")
 		require.Equal(t, "1111", p2.Get())
 	})
 
 	t.Run("Matches sequence without sep", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e,", Some(Any(Chars("a-g"), ",")))
+		node, p2 := runParser("a,b,c,d,e,", ZeroOrMore(Any(Chars("a-g"), ",")))
 		assertSequence(t, node, "a", ",", "b", ",", "c", ",", "d", ",", "e", ",")
 		require.Equal(t, 10, p2.Pos)
 	})
 
 	t.Run("splits words automatically on space", func(t *testing.T) {
-		node, p2 := runParser("hello world", Some(Chars("a-z")))
+		node, p2 := runParser("hello world", ZeroOrMore(Chars("a-z")))
 		assertSequence(t, node, "hello", "world")
 		require.Equal(t, "", p2.Get())
 	})
 
 	t.Run("Stops on error", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e,", Some(Chars("a-c"), ","))
+		node, p2 := runParser("a,b,c,d,e,", ZeroOrMore(Chars("a-c"), ","))
 		assertSequence(t, node, "a", "b", "c")
 		require.Equal(t, 6, p2.Pos)
 		require.Equal(t, "d,e,", p2.Get())
