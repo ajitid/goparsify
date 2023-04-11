@@ -47,7 +47,7 @@ func Parsify(p Parserish) Parser {
 	case Parser:
 		return p
 	case *Parser:
-		// Todo: Maybe capture this stack and on nil show it? Is there a good error library to do this?
+		// TODO: Maybe capture this stack and on nil show it? Is there a good error library to do this?
 		return func(ptr *State, node *Result) {
 			(*p)(ptr, node)
 		}
