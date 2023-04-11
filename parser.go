@@ -20,6 +20,11 @@ func (p Parser) Map(f func(n *Result)) Parser {
 	return Map(p, f)
 }
 
+// Chain shorthand for Chain(p, func())
+func (p Parser) Chain(getNextParser func(*Result) Parserish) Parser {
+	return Chain(p, getNextParser)
+}
+
 // VoidParser is a special type of parser that never returns anything but can still consume input
 type VoidParser func(*State)
 
