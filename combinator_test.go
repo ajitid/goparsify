@@ -190,7 +190,7 @@ func TestChain(t *testing.T) {
 	}
 
 	// taken from https://youtu.be/nqNzWgSRCeg?t=237
-	parser := Seq(Chars("a-z"), ":").Chain(func(n *Result) Parserish {
+	parser := Chain(Seq(Chars("a-z"), ":"), func(n *Result) Parserish {
 		typ := n.Child[0].Token
 		switch typ {
 		case "string":
