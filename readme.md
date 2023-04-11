@@ -1,6 +1,6 @@
 # Goparsify
 
-[![Go](https://github.com/damienstanton/goparsify/actions/workflows/go.yaml/badge.svg)](https://github.com/damienstanton/goparsify/actions/workflows/go.yaml)
+[![Go](https://github.com/ajitid/goparsify/actions/workflows/go.yaml/badge.svg)](https://github.com/ajitid/goparsify/actions/workflows/go.yaml)
 
 ---
 
@@ -24,14 +24,14 @@ Run(parser, input, ASCIIWhitespace)
 
 ```console
 $ make bench
-goos: darwin
-goarch: arm64
-pkg: github.com/damienstanton/goparsify/json
-BenchmarkUnmarshalParsec-8         33187             34662 ns/op           49375 B/op       1307 allocs/op
-BenchmarkUnmarshalParsify-8        59160             20299 ns/op           44596 B/op        212 allocs/op
-BenchmarkUnmarshalStdlib-8         52909             22604 ns/op           13427 B/op        251 allocs/op
+goos: linux
+goarch: amd64
+pkg: github.com/ajitid/goparsify/json
+BenchmarkUnmarshalParsec-16     	  10000	   133884 ns/op	  49378 B/op	   1307 allocs/op
+BenchmarkUnmarshalParsify-16    	  10000	   100330 ns/op	  68972 B/op	    480 allocs/op
+BenchmarkUnmarshalStdlib-16     	  14707	    81414 ns/op	  13427 B/op	    251 allocs/op
 PASS
-ok      github.com/damienstanton/goparsify/json 4.670s
+ok  	github.com/ajitid/goparsify/json	4.389s
 ```
 
 Most of the remaining small allocs are from putting things in `interface{}` and are pretty unavoidable. https://www.darkcoding.net/software/go-the-price-of-interface/ is a good read.
@@ -97,7 +97,7 @@ html.go:43 | /p></body>      |                 < found "<"
 html.go:20 | /p></body>      |                 identifier did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:43 | </p></body>     |               } did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:48 | </p></body>     |             } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:23 | </p></body>     |           } did not find [a-zA-Z][a-zA-Z0-9]*
+html.go:23 | </p></body>     |           } did not find <> or [a-zA-Z][a-zA-Z0-9]*
 html.go:24 | </p></body>     |         } found "[\"world\"]"
 html.go:44 | </p></body>     |         tend {
 html.go:44 | p></body>       |           </ found "</"
@@ -114,7 +114,7 @@ html.go:43 | /body>          |           < found "<"
 html.go:20 | /body>          |           identifier did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:43 | </body>         |         } did not find [a-zA-Z][a-zA-Z0-9]*
 html.go:48 | </body>         |       } did not find [a-zA-Z][a-zA-Z0-9]*
-html.go:23 | </body>         |     } did not find [a-zA-Z][a-zA-Z0-9]*
+html.go:23 | </body>         |     } did not find <> or [a-zA-Z][a-zA-Z0-9]*
 html.go:24 | </body>         |   } found "[\"hello \",html.ht
 html.go:44 | </body>         |   tend {
 html.go:44 | body>           |     </ found "</"
@@ -124,8 +124,7 @@ html.go:44 |                 |   } found "[</,,body,>]"
 html.go:48 |                 | } found "[[<,body,,map[strin
 --- PASS: TestParse (0.00s)
 PASS
-ok      github.com/damienstanton/goparsify/html 0.196s
-
+ok  	github.com/ajitid/goparsify/html	(cached)
 ```
 
 ## Debugging performance

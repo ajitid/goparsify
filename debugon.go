@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/damienstanton/goparsify/debug"
+	"github.com/ajitid/goparsify/debug"
 )
 
 var log io.Writer = nil

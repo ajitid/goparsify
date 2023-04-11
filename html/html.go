@@ -1,7 +1,7 @@
 package html
 
 import (
-	. "github.com/damienstanton/goparsify"
+	. "github.com/ajitid/goparsify"
 )
 
 func parse(input string) (result interface{}, err error) {

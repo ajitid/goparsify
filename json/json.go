@@ -1,7 +1,7 @@
 package json
 
 import (
-	. "github.com/damienstanton/goparsify"
+	. "github.com/ajitid/goparsify"
 )
 
 var (

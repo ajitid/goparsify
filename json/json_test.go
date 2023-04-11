@@ -6,7 +6,7 @@ import (
 
 	"os"
 
-	"github.com/damienstanton/goparsify"
+	"github.com/ajitid/goparsify"
 	parsecJson "github.com/prataprc/goparsec/json"
 	"github.com/stretchr/testify/require"
 )

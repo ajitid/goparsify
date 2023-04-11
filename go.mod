@@ -1,4 +1,4 @@
-module github.com/damienstanton/goparsify
+module github.com/ajitid/goparsify
 
 go 1.19
 

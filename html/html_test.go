@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/damienstanton/goparsify"
+	"github.com/ajitid/goparsify"
 	"github.com/stretchr/testify/require"
 )
 
