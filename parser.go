@@ -83,8 +83,8 @@ func Run(parser Parserish, input string, ws ...VoidParser) (result interface{}, 
 		ps.WS = ws[0]
 	}
 
-	ret := Result{Input: input}
-	p(ps, &ret)
+	ret := newResult(input)
+	p(ps, ret)
 	ps.WS(ps)
 
 	if ps.Error.expected != "" {

@@ -236,7 +236,7 @@ func TestChain(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		_, ps := runParser("number:&*%", parser)
 		require.Equal(t, "offset 7: expected number", ps.Error.Error())
-		require.Equal(t, 0, ps.Pos)
+		require.Equal(t, 7, ps.Pos)
 	})
 }
 

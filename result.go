@@ -20,6 +20,21 @@ type Result struct {
 	End    int
 }
 
+func copyResult(dst, src *Result) {
+	dst.Token = src.Token
+	dst.Child = src.Child
+	dst.Result = src.Result
+	dst.Input = src.Input
+	dst.Start = src.Start
+	dst.End = src.End
+}
+
+func newResult(input string) *Result {
+	return &Result{
+		Input: input,
+	}
+}
+
 // String stringifies a node. This is only called from debug code.
 func (r Result) String() string {
 	if r.Result != nil {

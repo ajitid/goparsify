@@ -189,31 +189,27 @@ func Map(parser Parserish, f func(n *Result)) Parser {
 func Chain(parser Parserish, getNextParser func(n *Result) Parserish) Parser {
 	p1 := Parsify(parser)
 
-	return NewParser("Chain()", func(ps *State, node *Result) {
-		node.Child = make([]Result, 2)
+	return func(ps *State, node *Result) {
 		startpos := ps.Pos
 
-		node.Child[0].Input = node.Input
-		p1(ps, &node.Child[0])
+		r1 := newResult(node.Input)
+		p1(ps, r1)
+		copyResult(node, r1)
 		if ps.Errored() {
-			// We are changing state.Pos, something that's against the rules (see parser.go)
-			// However these groups of code have been copied from Seq(), which also does this.
-			ps.Pos = startpos
 			return
 		}
 
-		node.Child[1].Input = node.Input
-		p2 := Parsify(getNextParser(&node.Child[0]))
-		p2(ps, &node.Child[1])
+		r2 := newResult(node.Input)
+		p2 := Parsify(getNextParser(r1))
+		p2(ps, r2)
+		copyResult(node, r2)
 		if ps.Errored() {
-			ps.Pos = startpos
 			return
 		}
 
-		node.Result = node.Child[1].Result
 		node.Start = startpos
 		node.End = ps.Pos
-	})
+	}
 }
 
 func flatten(n *Result) {
