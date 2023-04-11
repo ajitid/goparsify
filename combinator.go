@@ -86,11 +86,11 @@ func ZeroOrMore(parser Parserish, separator ...Parserish) Parser {
 	return NewParser("ZeroOrMore()", manyImpl(0, parser, separator...))
 }
 
-// Many matches one or more parsers and returns the value as .Child[n]
+// OneOrMore matches one or more parsers and returns the value as .Child[n]
 // an optional separator can be provided and that value will be consumed
 // but not returned. Only one separator can be provided.
-func Many(parser Parserish, separator ...Parserish) Parser {
-	return NewParser("Many()", manyImpl(1, parser, separator...))
+func OneOrMore(parser Parserish, separator ...Parserish) Parser {
+	return NewParser("OneOrMore()", manyImpl(1, parser, separator...))
 }
 
 func manyImpl(min int, op Parserish, sep ...Parserish) Parser {

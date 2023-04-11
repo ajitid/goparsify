@@ -260,13 +260,13 @@ A cut is a marker that prevents backtracking past the point it was set. This gre
 alpha := Chars("a-z")
 
 // without a cut if the close tag is left out the parser will backtrack and ignore the rest of the string
-nocut := Many(Any(Seq("<", alpha, ">"), alpha))
+nocut := OneOrMore(Any(Seq("<", alpha, ">"), alpha))
 _, err := Run(nocut, "asdf <foo")
 fmt.Println(err.Error())
 // Outputs: left unparsed: <foo
 
 // with a cut, once we see the open tag we know there must be a close tag that matches it, so the parser will error
-cut := Many(Any(Seq("<", Cut(), alpha, ">"), alpha))
+cut := OneOrMore(Any(Seq("<", Cut(), alpha, ">"), alpha))
 _, err = Run(cut, "asdf <foo")
 fmt.Println(err.Error())
 // Outputs: offset 9: expected >

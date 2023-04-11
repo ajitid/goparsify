@@ -51,7 +51,7 @@ func TestState_Preview(t *testing.T) {
 }
 
 func TestWhitespaces(t *testing.T) {
-	p := Many(Any("hello", "world", "!"))
+	p := OneOrMore(Any("hello", "world", "!"))
 
 	_, err := Run(p, "hello world\u2005!", ASCIIWhitespace)
 	require.Equal(t, "left unparsed: \u2005!", err.Error())

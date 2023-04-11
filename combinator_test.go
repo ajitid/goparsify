@@ -66,7 +66,7 @@ func TestAny(t *testing.T) {
 
 	t.Run("overlapping longest match", func(t *testing.T) {
 		EnableLogging(os.Stdout)
-		p := Many(Any("ab", "a"))
+		p := OneOrMore(Any("ab", "a"))
 
 		t.Run("a ab", func(t *testing.T) {
 			node, ps := runParser("a ab", p)
@@ -133,28 +133,28 @@ func TestZeroOrMore(t *testing.T) {
 	})
 }
 
-func TestMany(t *testing.T) {
+func TestOneOrMore(t *testing.T) {
 	t.Run("Matches sequence with sep", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e,", Many(Chars("a-g"), Exact(",")))
+		node, p2 := runParser("a,b,c,d,e,", OneOrMore(Chars("a-g"), Exact(",")))
 		assertSequence(t, node, "a", "b", "c", "d", "e")
 		require.Equal(t, 10, p2.Pos)
 	})
 
 	t.Run("Matches sequence without sep", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e,", Many(Any(Chars("abcdefg"), Exact(","))))
+		node, p2 := runParser("a,b,c,d,e,", OneOrMore(Any(Chars("abcdefg"), Exact(","))))
 		assertSequence(t, node, "a", ",", "b", ",", "c", ",", "d", ",", "e", ",")
 		require.Equal(t, 10, p2.Pos)
 	})
 
 	t.Run("Stops on error", func(t *testing.T) {
-		node, p2 := runParser("a,b,c,d,e,", Many(Chars("abc"), Exact(",")))
+		node, p2 := runParser("a,b,c,d,e,", OneOrMore(Chars("abc"), Exact(",")))
 		assertSequence(t, node, "a", "b", "c")
 		require.Equal(t, 6, p2.Pos)
 		require.Equal(t, "d,e,", p2.Get())
 	})
 
 	t.Run("Returns error if nothing matches", func(t *testing.T) {
-		_, p2 := runParser("a,b,c,d,e,", Many(Chars("def"), Exact(",")))
+		_, p2 := runParser("a,b,c,d,e,", OneOrMore(Chars("def"), Exact(",")))
 		require.Equal(t, "offset 0: expected def", p2.Error.Error())
 		require.Equal(t, "a,b,c,d,e,", p2.Get())
 	})
@@ -204,8 +204,8 @@ func TestCut(t *testing.T) {
 		require.Equal(t, 0, ps.Pos)
 	})
 
-	t.Run("test many", func(t *testing.T) {
-		_, ps := runParser("hello <world", Many(Any(Seq("<", Cut(), Chars("a-z"), ">"), Chars("a-z"))))
+	t.Run("test one or more", func(t *testing.T) {
+		_, ps := runParser("hello <world", OneOrMore(Any(Seq("<", Cut(), Chars("a-z"), ">"), Chars("a-z"))))
 		require.Equal(t, "offset 12: expected >", ps.Error.Error())
 		require.Equal(t, 0, ps.Pos)
 	})
