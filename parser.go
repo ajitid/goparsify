@@ -21,7 +21,7 @@ func (p Parser) Map(f func(n *Result)) Parser {
 }
 
 // Chain shorthand for Chain(p, func())
-func (p Parser) Chain(getNextParser func(*Result) Parserish) Parser {
+func (p Parser) Chain(getNextParser func(n *Result) Parserish) Parser {
 	return Chain(p, getNextParser)
 }
 
