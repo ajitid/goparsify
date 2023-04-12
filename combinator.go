@@ -196,15 +196,13 @@ func Chain(parser Parserish, getNextParser func(n *Result) Parserish) Parser {
 
 		r1 := newResult(node.Input)
 		p1(ps, r1)
-		copyResult(node, r1)
 		if ps.Errored() {
+			copyResult(node, r1)
 			return
 		}
 
-		r2 := newResult(node.Input)
 		p2 := Parsify(getNextParser(r1))
-		p2(ps, r2)
-		copyResult(node, r2)
+		p2(ps, node)
 		if ps.Errored() {
 			return
 		}
