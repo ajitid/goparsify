@@ -54,7 +54,9 @@ func Any(parsers ...Parserish) Parser {
 		var longestError Error
 		expected := []string{}
 		for _, parser := range parserfied {
-			parser(ps, node)
+			r := newResult(node.Input)
+			parser(ps, r)
+			copyResult(node, r)
 			if ps.Errored() {
 				if ps.Error.pos >= longestError.pos {
 					longestError = ps.Error
