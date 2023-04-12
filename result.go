@@ -29,7 +29,7 @@ func copyResult(dst, src *Result) {
 	dst.End = src.End
 }
 
-func newResult(input string) *Result {
+func NewResult(input string) *Result {
 	return &Result{
 		Input: input,
 	}

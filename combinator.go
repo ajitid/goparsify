@@ -192,7 +192,7 @@ func Chain(parser Parserish, getNextParser func(n *Result) Parserish) Parser {
 	return func(ps *State, node *Result) {
 		startpos := ps.Pos
 
-		r1 := newResult(node.Input)
+		r1 := NewResult(node.Input)
 		p1(ps, r1)
 		if ps.Errored() {
 			copyResult(node, r1)

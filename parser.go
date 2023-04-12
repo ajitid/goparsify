@@ -88,7 +88,7 @@ func Run(parser Parserish, input string, ws ...VoidParser) (result interface{}, 
 		ps.WS = ws[0]
 	}
 
-	ret := newResult(input)
+	ret := NewResult(input)
 	p(ps, ret)
 	ps.WS(ps)
 
@@ -292,7 +292,7 @@ func Until(terminators ...string) Parser {
 // Noop is no-op parser i.e. it does nothing
 var Noop Parser = NewParser("Noop()", func(s *State, r *Result) {})
 
-// Fail invokes `state.ErrorHere()`
-func Fail(expected string) Parser {
-	return NewParser("Fail()", func(s *State, r *Result) { s.ErrorHere(expected) })
+// ErrorHere invokes `state.ErrorHere()`
+func ErrorHere(expected string) Parser {
+	return NewParser("ErrorHere()", func(s *State, r *Result) { s.ErrorHere(expected) })
 }
