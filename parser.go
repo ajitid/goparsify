@@ -21,7 +21,7 @@ func (p Parser) Map(f func(n *Result)) Parser {
 }
 
 // Chain shorthand for Chain(p, func())
-func (p Parser) Chain(getNextParser func(n *Result) Parserish) Parser {
+func (p Parser) Chain(getNextParser func(prevN *Result) Parserish) Parser {
 	return Chain(p, getNextParser)
 }
 
@@ -289,10 +289,7 @@ func Until(terminators ...string) Parser {
 	})
 }
 
-// Noop is no-op parser i.e. it does nothing
-var Noop Parser = NewParser("Noop()", func(s *State, r *Result) {})
-
-// ErrorHere invokes `state.ErrorHere()`
-func ErrorHere(expected string) Parser {
-	return NewParser("ErrorHere()", func(s *State, r *Result) { s.ErrorHere(expected) })
+// Noop gives a no-op parser i.e. a parser that does nothing
+func Noop() Parser {
+	return NewParser("Noop()", func(*State, *Result) {})
 }

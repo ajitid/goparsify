@@ -1,7 +1,6 @@
 package goparsify
 
 import (
-	"fmt"
 	"strconv"
 	"testing"
 
@@ -190,42 +189,42 @@ func TestChain(t *testing.T) {
 	}
 
 	// taken from https://youtu.be/nqNzWgSRCeg?t=237
-	parser := Chain(Seq(Chars("a-z"), ":"), func(n *Result) Parserish {
-		typ := n.Child[0].Token
-		switch typ {
-		case "string":
-			return Chars("a-zA-Z0-9").Map(func(n *Result) {
-				n.Result = data{
-					typ: typ,
-					val: n.Token,
-				}
-			})
-		case "number":
-			return NumberLit().Map(func(n *Result) {
-				n.Result = data{
-					typ: typ,
-					val: n.Result,
-				}
-			})
-		case "diceroll":
-			num := Chars("0-9").Map(func(n *Result) {
-				n.Result, _ = strconv.Atoi(n.Token)
-			})
-			return Seq(num, "d", num).Map(func(n *Result) {
-				a := n.Child[0].Result.(int)
-				b := n.Child[2].Result.(int)
+	parser := Chain(
+		Seq(Any("string", "number", "diceroll"), ":"),
+		func(prevN *Result) Parserish {
+			typ := prevN.Child[0].Token
+			switch typ {
+			case "string":
+				return Chars("a-zA-Z0-9").Map(func(n *Result) {
+					n.Result = data{
+						typ: typ,
+						val: n.Token,
+					}
+				})
+			case "number":
+				return NumberLit().Map(func(n *Result) {
+					n.Result = data{
+						typ: typ,
+						val: n.Result,
+					}
+				})
+			case "diceroll":
+				num := Chars("0-9").Map(func(n *Result) {
+					n.Result, _ = strconv.Atoi(n.Token)
+				})
+				return Seq(num, "d", num).Map(func(n *Result) {
+					a := n.Child[0].Result.(int)
+					b := n.Child[2].Result.(int)
 
-				n.Result = data{
-					typ: typ,
-					val: []int{a, b},
-				}
-			})
-		default:
-			return func(ps *State, node *Result) {
-				ps.ErrorHere(fmt.Sprintf("unsupported type `%s`", typ))
+					n.Result = data{
+						typ: typ,
+						val: []int{a, b},
+					}
+				})
+			default:
+				panic("case for type `" + typ + "` not covered")
 			}
-		}
-	})
+		})
 
 	t.Run("success", func(t *testing.T) {
 		result, _ := runParser("string:something", parser)
@@ -237,6 +236,12 @@ func TestChain(t *testing.T) {
 		_, ps := runParser("number:&*%", parser)
 		require.Equal(t, "offset 7: expected number", ps.Error.Error())
 		require.Equal(t, 7, ps.Pos)
+	})
+
+	t.Run("wrong type", func(t *testing.T) {
+		_, ps := runParser("dunno:&*%", parser)
+		require.Equal(t, "offset 0: expected string or number or diceroll", ps.Error.Error())
+		require.Equal(t, 0, ps.Pos)
 	})
 }
 

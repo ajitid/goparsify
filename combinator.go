@@ -186,7 +186,7 @@ func Map(parser Parserish, f func(n *Result)) Parser {
 // parser, and with this knowledge, lets you return a successive parser.
 //
 // Result of this successive parser is considered as the result of the Chain.
-func Chain(parser Parserish, getNextParser func(n *Result) Parserish) Parser {
+func Chain(parser Parserish, getNextParser func(prevN *Result) Parserish) Parser {
 	p1 := Parsify(parser)
 
 	return func(ps *State, node *Result) {
