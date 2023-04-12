@@ -288,3 +288,11 @@ func Until(terminators ...string) Parser {
 		node.Token = ps.Input[startPos:ps.Pos]
 	})
 }
+
+// Noop is no-op parser i.e. it does nothing
+var Noop Parser = NewParser("Noop()", func(s *State, r *Result) {})
+
+// Fail invokes `state.ErrorHere()`
+func Fail(expected string) Parser {
+	return NewParser("Fail()", func(s *State, r *Result) { s.ErrorHere(expected) })
+}
